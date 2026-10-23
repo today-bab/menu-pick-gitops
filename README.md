@@ -9,6 +9,7 @@ Argo CD가 이 저장소를 보고 클러스터를 같은 상태로 맞춘다.
 bootstrap/     처음 한 번만 직접 적용 (Argo CD 설치 + 루트 Application)
 apps/          Argo CD Application 목록 (app-of-apps). 루트 Application이 이 폴더를 동기화
 platform/      앱이 공통으로 쓰는 클러스터 구성요소 (Sealed Secrets 등)
+services/      menu-pick 서비스 매니페스트 (menu-pick-backend)
 ```
 
 - 클러스터에 무엇을 배포할지는 `apps/`에 Application을 추가해서 정한다.
