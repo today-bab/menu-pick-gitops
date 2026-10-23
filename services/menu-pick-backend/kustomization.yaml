@@ -1,8 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-
 namespace: menu-pick
-
 resources:
   - namespace.yaml
   # KAKAO_REST_KEY. 다시 만들 때:
@@ -11,8 +9,7 @@ resources:
   - sealed-secret.yaml
   - deployment.yaml
   - service.yaml
-
 images:
   # 백엔드 CI가 main에 push될 때마다 이 태그를 커밋 SHA로 갱신한다
   - name: ghcr.io/today-bab/menu-pick-backend
-    newTag: 45883174af641a09daf499d8552428b5f60be807
+    newTag: aebbff6908d28777b8712fc738dd8ef64b2491c1
