@@ -9,6 +9,10 @@ resources:
   #   kubectl create secret generic alertmanager-discord -n monitoring --from-literal=webhook-url=https://discord.com/api/webhooks/... --dry-run=client -o yaml \
   #     | kubeseal --controller-namespace kube-system --controller-name sealed-secrets-controller --format yaml > alertmanager-discord.sealed-secret.yaml
   - alertmanager-discord.sealed-secret.yaml
+  # Grafana 관리자 계정 (values의 grafana.admin.existingSecret). 비밀번호를 바꿀 때:
+  #   kubectl create secret generic grafana-admin -n monitoring --from-literal=admin-user=admin --from-literal=admin-password=... --dry-run=client -o yaml \
+  #     | kubeseal --controller-namespace kube-system --controller-name sealed-secrets-controller --format yaml > grafana-admin.sealed-secret.yaml
+  - grafana-admin.sealed-secret.yaml
 
 # Grafana 사이드카가 grafana_dashboard 라벨이 붙은 ConfigMap을 대시보드로 불러온다
 configMapGenerator:
