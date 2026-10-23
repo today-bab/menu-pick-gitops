@@ -1,0 +1,11 @@
+# Argo CD 설치. 처음 한 번은 직접 적용하고, 이후로는 apps/argocd.yaml을 통해 Argo CD가 자기 자신을 관리한다.
+#   kubectl apply --server-side -k bootstrap/argocd
+# (CRD가 커서 client-side apply의 annotation 크기 제한에 걸리므로 server-side로 적용)
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: argocd
+
+resources:
+  - namespace.yaml
+  - https://raw.githubusercontent.com/argoproj/argo-cd/v3.5.6/manifests/install.yaml
