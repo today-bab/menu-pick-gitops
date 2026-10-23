@@ -77,6 +77,10 @@ alertmanager:
         memory: 128Mi
 
 grafana:
+  # Cloudflare Tunnel로 공개하는 외부 주소. 앞단의 Cloudflare Access가 허용한 이메일만 들어올 수 있다
+  grafana.ini:
+    server:
+      root_url: https://grafana.todaybab.com
   # 대시보드는 ConfigMap(코드)으로 관리하므로 디스크에 저장하지 않는다
   persistence:
     enabled: false
