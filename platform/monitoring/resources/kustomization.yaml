@@ -9,3 +9,16 @@ resources:
   #   kubectl create secret generic alertmanager-discord -n monitoring --from-literal=webhook-url=https://discord.com/api/webhooks/... --dry-run=client -o yaml \
   #     | kubeseal --controller-namespace kube-system --controller-name sealed-secrets-controller --format yaml > alertmanager-discord.sealed-secret.yaml
   - alertmanager-discord.sealed-secret.yaml
+
+# Grafana 사이드카가 grafana_dashboard 라벨이 붙은 ConfigMap을 대시보드로 불러온다
+configMapGenerator:
+  - name: grafana-dashboard-menu-pick
+    files:
+      - dashboards/menu-pick.json
+    options:
+      disableNameSuffixHash: true
+      labels:
+        grafana_dashboard: "1"
+      annotations:
+        # Grafana에서 menu-pick 폴더에 넣는다
+        grafana_folder: menu-pick

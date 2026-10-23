@@ -1,0 +1,112 @@
+{
+  "uid": "menu-pick",
+  "title": "menu-pick",
+  "tags": ["menu-pick"],
+  "timezone": "Asia/Seoul",
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "schemaVersion": 39,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "백엔드 상태",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "sum(up{job=\"menu-pick-backend\"})", "legendFormat": "살아 있는 Pod" }],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "캐시 적중률 (1시간)",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(increase(cache_gets_total{application=\"menu-pick-backend\", result=\"hit\"}[1h])) / sum(increase(cache_gets_total{application=\"menu-pick-backend\"}[1h]))"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "decimals": 1 } }
+    },
+    {
+      "type": "stat",
+      "title": "Pod 재시작 (24시간)",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"menu-pick\"}[24h]))" }],
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "메뉴 뽑기 (24시간)",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(increase(http_server_requests_seconds_count{application=\"menu-pick-backend\", uri=\"/api/menus/pick\", method=\"GET\"}[24h]))"
+        }
+      ],
+      "fieldConfig": { "defaults": { "decimals": 0 } }
+    },
+    {
+      "type": "timeseries",
+      "title": "메뉴 뽑기 요청 (상태 코드별, 초당)",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (status) (rate(http_server_requests_seconds_count{application=\"menu-pick-backend\", uri=\"/api/menus/pick\"}[5m]))",
+          "legendFormat": "{{status}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "메뉴 뽑기 평균 응답 시간",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_requests_seconds_sum{application=\"menu-pick-backend\", uri=\"/api/menus/pick\"}[5m])) / sum(rate(http_server_requests_seconds_count{application=\"menu-pick-backend\", uri=\"/api/menus/pick\"}[5m]))",
+          "legendFormat": "평균"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "카카오 로컬 API 호출 (결과별, 초당)",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (outcome) (rate(http_client_requests_seconds_count{application=\"menu-pick-backend\", client_name=\"dapi.kakao.com\"}[5m]))",
+          "legendFormat": "{{outcome}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "카카오 로컬 API 평균 응답 시간",
+      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum(rate(http_client_requests_seconds_sum{application=\"menu-pick-backend\", client_name=\"dapi.kakao.com\"}[5m])) / sum(rate(http_client_requests_seconds_count{application=\"menu-pick-backend\", client_name=\"dapi.kakao.com\"}[5m]))",
+          "legendFormat": "평균"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    }
+  ]
+}

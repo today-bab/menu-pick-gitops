@@ -88,3 +88,29 @@ grafana:
       memory: 128Mi
     limits:
       memory: 256Mi
+  # ConfigMap 대시보드의 grafana_folder 주석을 Grafana 폴더로 쓴다 (platform/monitoring/resources)
+  sidecar:
+    dashboards:
+      folderAnnotation: grafana_folder
+      provider:
+        foldersFromFilesStructure: true
+  # grafana.com 공개 대시보드 (Grafana가 시작할 때 내려받는다)
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: spring
+          folder: Spring Boot
+          type: file
+          options:
+            path: /var/lib/grafana/dashboards/spring
+  dashboards:
+    spring:
+      jvm-micrometer:
+        gnetId: 4701
+        revision: 10
+        datasource: Prometheus
+      spring-boot-statistics:
+        gnetId: 19004
+        revision: 1
+        datasource: Prometheus
