@@ -17,6 +17,10 @@ spec:
     - repoURL: https://github.com/today-bab/menu-pick-gitops.git
       targetRevision: main
       ref: values
+    # 차트 밖 리소스 (알림 Secret, 대시보드 등)
+    - repoURL: https://github.com/today-bab/menu-pick-gitops.git
+      targetRevision: main
+      path: platform/monitoring/resources
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring

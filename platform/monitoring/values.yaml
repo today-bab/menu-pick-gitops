@@ -43,7 +43,32 @@ prometheus:
               storage: 10Gi
 
 alertmanager:
+  config:
+    route:
+      receiver: discord
+      group_by: [alertname, namespace]
+      group_wait: 30s
+      group_interval: 5m
+      # 해결되지 않은 경고는 12시간마다 다시 알린다
+      repeat_interval: 12h
+      routes:
+        # Watchdog은 알림 파이프라인이 살아 있음을 보이려고 항상 울리는 경고, InfoInhibitor는 억제용이라 보내지 않는다
+        - receiver: "null"
+          matchers:
+            - alertname =~ "Watchdog|InfoInhibitor"
+        - receiver: "null"
+          matchers:
+            - severity =~ "none|info"
+    receivers:
+      - name: "null"
+      - name: discord
+        discord_configs:
+          - webhook_url_file: /etc/alertmanager/secrets/alertmanager-discord/webhook-url
+            send_resolved: true
   alertmanagerSpec:
+    # platform/monitoring/resources의 SealedSecret이 만드는 Secret을 마운트한다
+    secrets:
+      - alertmanager-discord
     resources:
       requests:
         cpu: 10m

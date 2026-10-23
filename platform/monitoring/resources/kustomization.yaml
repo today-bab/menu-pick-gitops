@@ -1,0 +1,11 @@
+# 차트 밖에서 monitoring 네임스페이스에 함께 배포하는 리소스
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: monitoring
+
+resources:
+  # Discord 웹훅 URL (Alertmanager가 /etc/alertmanager/secrets/alertmanager-discord/webhook-url로 읽음). 다시 만들 때:
+  #   kubectl create secret generic alertmanager-discord -n monitoring --from-literal=webhook-url=https://discord.com/api/webhooks/... --dry-run=client -o yaml \
+  #     | kubeseal --controller-namespace kube-system --controller-name sealed-secrets-controller --format yaml > alertmanager-discord.sealed-secret.yaml
+  - alertmanager-discord.sealed-secret.yaml
