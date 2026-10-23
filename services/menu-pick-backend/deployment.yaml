@@ -28,6 +28,9 @@ spec:
                 secretKeyRef:
                   name: menu-pick-backend
                   key: KAKAO_REST_KEY
+            # API를 호출할 수 있는 프론트엔드 주소 (Vercel)
+            - name: CORS_ALLOWED_ORIGINS
+              value: https://menu.todaybab.com
           resources:
             requests:
               cpu: 100m
