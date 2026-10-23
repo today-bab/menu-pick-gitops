@@ -1,0 +1,51 @@
+# 백엔드 경고 규칙. Pod 반복 재시작(KubePodCrashLooping) 등 일반적인 경고는 kube-prometheus-stack 기본 규칙이 맡는다.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: menu-pick-backend
+spec:
+  groups:
+    - name: menu-pick-backend
+      rules:
+        - alert: MenuPickBackendDown
+          expr: absent(up{job="menu-pick-backend"} == 1)
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: menu-pick 백엔드에서 지표를 수집할 수 없음
+            description: 2분 넘게 살아 있는 백엔드 Pod가 없습니다. Pod 상태와 최근 배포를 확인하세요.
+
+        - alert: MenuPickHighServerErrorRate
+          expr: |
+            sum(rate(http_server_requests_seconds_count{job="menu-pick-backend", outcome="SERVER_ERROR"}[5m]))
+              / sum(rate(http_server_requests_seconds_count{job="menu-pick-backend"}[5m])) > 0.05
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: menu-pick 백엔드 5xx 비율이 5%를 넘음
+            description: '최근 5분 5xx 비율: {{ $value | humanizePercentage }}'
+
+        - alert: MenuPickKakaoApiFailing
+          expr: |
+            sum(rate(http_client_requests_seconds_count{job="menu-pick-backend", client_name="dapi.kakao.com", outcome!="SUCCESS"}[10m]))
+              / sum(rate(http_client_requests_seconds_count{job="menu-pick-backend", client_name="dapi.kakao.com"}[10m])) > 0.2
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: 카카오 로컬 API 호출이 자주 실패함
+            description: '최근 10분 카카오 호출 실패율: {{ $value | humanizePercentage }}. 키·쿼터·카카오 장애를 확인하세요.'
+
+        - alert: MenuPickSlowResponses
+          # 평균 응답 시간 (지연 분포 히스토그램은 수집하지 않으므로 평균으로 본다)
+          expr: |
+            sum(rate(http_server_requests_seconds_sum{job="menu-pick-backend", uri="/api/menus/pick"}[10m]))
+              / sum(rate(http_server_requests_seconds_count{job="menu-pick-backend", uri="/api/menus/pick"}[10m])) > 2
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: 메뉴 뽑기 API 평균 응답이 2초를 넘음
+            description: '최근 10분 평균 응답 시간: {{ $value | humanizeDuration }}'

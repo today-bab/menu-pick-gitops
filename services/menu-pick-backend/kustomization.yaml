@@ -9,6 +9,9 @@ resources:
   - sealed-secret.yaml
   - deployment.yaml
   - service.yaml
+  # 지표 수집과 경고 규칙 (platform/monitoring의 Prometheus가 읽음)
+  - servicemonitor.yaml
+  - prometheusrule.yaml
 images:
   # 백엔드 CI가 main에 push될 때마다 이 태그를 커밋 SHA로 갱신한다
   - name: ghcr.io/today-bab/menu-pick-backend
