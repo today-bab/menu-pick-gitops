@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: menu-pick-backend
+spec:
+  selector:
+    app: menu-pick-backend
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

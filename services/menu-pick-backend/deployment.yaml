@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: menu-pick-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: menu-pick-backend
+  template:
+    metadata:
+      labels:
+        app: menu-pick-backend
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+      containers:
+        - name: menu-pick-backend
+          # 태그는 kustomization.yaml의 images에서 정한다 (CI가 갱신)
+          image: ghcr.io/today-bab/menu-pick-backend
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: KAKAO_REST_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: menu-pick-backend
+                  key: KAKAO_REST_KEY
+          resources:
+            requests:
+              cpu: 100m
+              memory: 384Mi
+            limits:
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            # 읽기 전용 루트에서 Tomcat·JVM 임시 파일용
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
