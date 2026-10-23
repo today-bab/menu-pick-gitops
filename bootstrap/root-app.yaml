@@ -1,0 +1,22 @@
+# 루트 Application (app-of-apps). apps/ 폴더의 Application들을 클러스터에 만들고 계속 맞춘다.
+# Argo CD를 설치한 뒤 한 번만 직접 적용한다.
+#   kubectl apply -f bootstrap/root-app.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/today-bab/menu-pick-gitops.git
+    targetRevision: main
+    path: apps
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      # apps/에서 지운 Application은 클러스터에서도 지운다
+      prune: true
+      selfHeal: true

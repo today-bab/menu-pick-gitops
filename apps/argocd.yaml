@@ -1,0 +1,23 @@
+# Argo CD가 자기 자신(bootstrap/argocd)을 관리한다. 버전을 올릴 때는 kustomization의 URL만 바꾸면 된다.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/today-bab/menu-pick-gitops.git
+    targetRevision: main
+    path: bootstrap/argocd
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      # Argo CD 자신의 리소스는 실수로 지워지지 않게 prune하지 않는다
+      prune: false
+      selfHeal: true
+    syncOptions:
+      # CRD가 커서 server-side apply가 필요하다
+      - ServerSideApply=true
