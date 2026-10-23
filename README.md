@@ -24,3 +24,25 @@ ssh -N -L 6443:10.10.10.10:6443 home1
 ```
 
 kubeconfig의 서버를 `https://127.0.0.1:6443`, `tls-server-name: k8s-master`로 둔 context를 쓴다.
+
+## 처음 설치 (클러스터를 새로 만들었을 때)
+
+```sh
+kubectl apply --server-side -k bootstrap/argocd
+kubectl -n argocd rollout status deploy/argocd-server
+kubectl apply -f bootstrap/root-app.yaml
+```
+
+이후로는 Argo CD가 `apps/`를 보고 나머지(Argo CD 자신, Sealed Secrets, 앱)를 설치한다.
+
+## Argo CD UI
+
+외부에 공개하지 않고 port-forward로 연다.
+
+```sh
+kubectl -n argocd port-forward svc/argocd-server 8443:443
+# https://localhost:8443 , 사용자 admin
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
+```
+
+로그인한 뒤 비밀번호를 바꾸고 `argocd-initial-admin-secret`은 지운다.
