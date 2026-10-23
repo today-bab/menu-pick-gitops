@@ -79,6 +79,14 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.pas
 
 ### Grafana
 
+**https://grafana.todaybab.com** (Cloudflare Tunnel)
+
+- 앞단의 Cloudflare Access(Zero Trust > Access controls > Applications > grafana, 정책 `me only`)가 허용한 이메일만 들어올 수 있다. 이메일로 받은 일회용 코드로 로그인한 뒤 Grafana `admin`으로 다시 로그인한다.
+- 터널 경로: `grafana.todaybab.com` → `http://kube-prometheus-stack-grafana.monitoring.svc.cluster.local:80` (Cloudflare 대시보드에서 관리)
+- 경로를 새로 열 때는 Access 애플리케이션을 먼저 만들고 터널 경로를 나중에 추가한다. 순서가 바뀌면 그 사이 보호 없이 공개된다.
+
+클러스터 안에서 바로 열 때:
+
 ```sh
 kubectl -n monitoring port-forward svc/kube-prometheus-stack-grafana 3000:80
 # http://localhost:3000 , 사용자 admin
