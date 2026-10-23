@@ -1,0 +1,6 @@
+# Sealed Secrets 컨트롤러 (kube-system). 클러스터만 풀 수 있게 암호화한 SealedSecret을 Secret으로 바꿔 준다.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.40.0/controller.yaml
