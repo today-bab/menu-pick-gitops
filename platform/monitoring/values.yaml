@@ -1,0 +1,65 @@
+# kube-prometheus-stack values (차트 버전은 apps/monitoring.yaml)
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+
+# kubeadm은 이 구성요소들의 지표를 노드의 127.0.0.1에만 열어 Prometheus가 닿지 못한다.
+# 켜 두면 수집 실패 경고만 계속 나므로 수집과 관련 규칙을 끈다.
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeProxy:
+  enabled: false
+defaultRules:
+  rules:
+    etcd: false
+    kubeSchedulerAlerting: false
+    kubeSchedulerRecording: false
+    kubeControllerManager: false
+    kubeProxy: false
+
+prometheus:
+  prometheusSpec:
+    retention: 7d
+    retentionSize: 8GB
+    # 다른 네임스페이스(menu-pick 등)의 ServiceMonitor·PrometheusRule도 Helm 라벨 없이 찾는다
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        memory: 1536Mi
+    # 기본 StorageClass(nfs-csi). 재시작해도 7일치 지표를 유지한다
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: [ReadWriteOnce]
+          resources:
+            requests:
+              storage: 10Gi
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        memory: 128Mi
+
+grafana:
+  # 대시보드는 ConfigMap(코드)으로 관리하므로 디스크에 저장하지 않는다
+  persistence:
+    enabled: false
+  defaultDashboardsTimezone: Asia/Seoul
+  # 관리자 비밀번호는 차트가 무작위로 만들어 Secret(kube-prometheus-stack-grafana)에 둔다
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
