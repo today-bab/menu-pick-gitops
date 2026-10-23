@@ -82,12 +82,13 @@ grafana:
     enabled: false
   defaultDashboardsTimezone: Asia/Seoul
   # 관리자 비밀번호는 차트가 무작위로 만들어 Secret(kube-prometheus-stack-grafana)에 둔다
+  # 256Mi에서는 로그인해 대시보드를 여는 순간 메모리 부족(OOMKilled)으로 재시작됐다
   resources:
     requests:
       cpu: 50m
-      memory: 128Mi
-    limits:
       memory: 256Mi
+    limits:
+      memory: 512Mi
   # ConfigMap 대시보드의 grafana_folder 주석을 Grafana 폴더로 쓴다 (platform/monitoring/resources)
   sidecar:
     dashboards:
