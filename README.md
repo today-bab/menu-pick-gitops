@@ -90,8 +90,11 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.pas
 ```sh
 kubectl -n monitoring port-forward svc/kube-prometheus-stack-grafana 3000:80
 # http://localhost:3000 , 사용자 admin
-kubectl -n monitoring get secret kube-prometheus-stack-grafana -o jsonpath='{.data.admin-password}' | base64 -d
 ```
+
+관리자 비밀번호는 `platform/monitoring/resources/grafana-admin.sealed-secret.yaml`에 암호화되어 있다.
+Grafana는 디스크에 저장하지 않으므로 화면에서 비밀번호를 바꾸면 재시작할 때 이 값으로 돌아간다.
+바꿀 때는 `platform/monitoring/resources/kustomization.yaml`의 주석대로 SealedSecret을 다시 만든다.
 
 - `menu-pick` 폴더: 서비스 대시보드 (`platform/monitoring/resources/dashboards/menu-pick.json`)
 - `Spring Boot` 폴더: JVM (Micrometer), Spring Boot 3.x Statistics (grafana.com 공개 대시보드)
