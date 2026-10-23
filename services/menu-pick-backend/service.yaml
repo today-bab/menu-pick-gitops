@@ -2,10 +2,18 @@ apiVersion: v1
 kind: Service
 metadata:
   name: menu-pick-backend
+  labels:
+    # ServiceMonitor가 이 라벨로 수집 대상을 찾는다
+    app: menu-pick-backend
 spec:
   selector:
     app: menu-pick-backend
   ports:
+    # Cloudflare Tunnel은 이 포트(80)만 연결한다
     - name: http
       port: 80
       targetPort: http
+    # 클러스터 안에서 Prometheus만 수집
+    - name: management
+      port: 8081
+      targetPort: management
