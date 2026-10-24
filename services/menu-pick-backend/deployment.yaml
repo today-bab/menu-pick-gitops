@@ -3,7 +3,9 @@ kind: Deployment
 metadata:
   name: menu-pick-backend
 spec:
-  replicas: 1
+  # 한 Pod가 재시작되거나 배포 중이어도 요청을 받도록 두 개를 띄운다.
+  # 캐시(Caffeine)는 Pod마다 따로 있어서 같은 위치라도 Pod별로 카카오를 한 번씩 호출할 수 있다
+  replicas: 2
   selector:
     matchLabels:
       app: menu-pick-backend
