@@ -1,0 +1,12 @@
+# Prometheus가 Valkey 지표(redis_exporter, 9121)를 30초마다 수집한다
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: menu-pick-valkey
+spec:
+  selector:
+    matchLabels:
+      app: menu-pick-valkey
+  endpoints:
+    - port: metrics
+      interval: 30s
