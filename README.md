@@ -90,8 +90,15 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.pas
 
 - 백엔드는 관리 포트 8081에서 `/actuator/prometheus`를 연다. 터널은 8080만 연결하므로 지표는 외부에 공개되지 않는다.
 - `services/menu-pick-backend/servicemonitor.yaml`이 30초마다 수집한다.
-- 경고 규칙(`prometheusrule.yaml`): 백엔드 다운(critical), 5xx 비율 5% 초과, 카카오 호출 실패율 20% 초과, 평균 응답 2초 초과.
+- 경고 규칙(`prometheusrule.yaml`): 백엔드 다운(critical), 5xx 비율 5% 초과, 카카오 호출 실패율 20% 초과,
+  캐시 오류로 카카오 직접 호출(`restaurant_cache_errors_total`), 평균 응답 2초 초과.
   Pod 반복 재시작·노드 자원 부족 같은 일반 경고는 kube-prometheus-stack 기본 규칙이 맡는다.
+
+### Valkey 지표
+
+- Valkey Pod의 `redis_exporter` 사이드카가 9121 포트로 메모리·키 수·쫓겨난 키 지표를 연다. NetworkPolicy로 Prometheus만 접근할 수 있다.
+- `services/menu-pick-valkey/servicemonitor.yaml`이 30초마다 수집한다.
+- 경고 규칙(`services/menu-pick-valkey/prometheusrule.yaml`): Valkey 다운(warning). 백엔드는 캐시 없이 계속 동작하므로 critical이 아니다.
 
 ### Grafana
 
@@ -112,7 +119,7 @@ kubectl -n monitoring port-forward svc/kube-prometheus-stack-grafana 3000:80
 Grafana는 디스크에 저장하지 않으므로 화면에서 비밀번호를 바꾸면 재시작할 때 이 값으로 돌아간다.
 바꿀 때는 `platform/monitoring/resources/kustomization.yaml`의 주석대로 SealedSecret을 다시 만든다.
 
-- `menu-pick` 폴더: 서비스 대시보드 (`platform/monitoring/resources/dashboards/menu-pick.json`)
+- `menu-pick` 폴더: 서비스 대시보드 (`platform/monitoring/resources/dashboards/menu-pick.json`). 아래쪽 두 줄은 캐시(Valkey) 상태·메모리·적중과 오류
 - `Spring Boot` 폴더: JVM (Micrometer), Spring Boot 3.x Statistics (grafana.com 공개 대시보드)
 
 대시보드를 고칠 때는 Grafana에서 편집한 뒤 JSON을 내보내 이 저장소의 파일을 바꾼다. Grafana는 디스크에 저장하지 않으므로 화면에서만 고친 내용은 재시작하면 사라진다.

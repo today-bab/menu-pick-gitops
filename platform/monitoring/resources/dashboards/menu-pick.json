@@ -107,6 +107,81 @@
         }
       ],
       "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "type": "stat",
+      "title": "캐시(Valkey) 상태",
+      "gridPos": { "x": 0, "y": 20, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "max(redis_up{job=\"menu-pick-valkey\"}) or vector(0)" }],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [{ "type": "value", "options": { "0": { "text": "응답 없음" }, "1": { "text": "정상" } } }],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "캐시에 저장된 칸 수",
+      "gridPos": { "x": 6, "y": 20, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "sum(redis_db_keys{job=\"menu-pick-valkey\"}) or vector(0)" }],
+      "fieldConfig": { "defaults": { "decimals": 0 } }
+    },
+    {
+      "type": "stat",
+      "title": "메모리 부족으로 지운 키 (24시간)",
+      "gridPos": { "x": 12, "y": 20, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "sum(increase(redis_evicted_keys_total{job=\"menu-pick-valkey\"}[24h])) or vector(0)" }],
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "캐시 오류 (24시간)",
+      "gridPos": { "x": 18, "y": 20, "w": 6, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "sum(increase(restaurant_cache_errors_total{application=\"menu-pick-backend\"}[24h])) or vector(0)" }],
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] }
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Valkey 메모리 사용량",
+      "gridPos": { "x": 0, "y": 24, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "max(redis_memory_used_bytes{job=\"menu-pick-valkey\"})", "legendFormat": "사용" },
+        { "expr": "max(redis_memory_max_bytes{job=\"menu-pick-valkey\"})", "legendFormat": "한도 (maxmemory)" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes", "min": 0 } }
+    },
+    {
+      "type": "timeseries",
+      "title": "캐시 조회 결과와 오류 (초당)",
+      "gridPos": { "x": 12, "y": 24, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (result) (rate(cache_gets_total{application=\"menu-pick-backend\", result=~\"hit|miss\"}[5m]))",
+          "legendFormat": "{{result}}"
+        },
+        {
+          "expr": "sum by (operation) (rate(restaurant_cache_errors_total{application=\"menu-pick-backend\"}[5m]))",
+          "legendFormat": "오류 ({{operation}})"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" } }
     }
   ]
 }
