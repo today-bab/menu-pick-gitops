@@ -12,7 +12,9 @@ platform/      앱이 공통으로 쓰는 클러스터 구성요소
   sealed-secrets/   비밀값 암호화 컨트롤러
   cloudflared/      Cloudflare Tunnel 커넥터 (api.todaybab.com → menu-pick-backend)
   monitoring/       kube-prometheus-stack values, 알림 Secret, Grafana 대시보드
-services/      menu-pick 서비스 매니페스트 (menu-pick-backend, 수집·경고 규칙 포함)
+services/      menu-pick 서비스 매니페스트
+  menu-pick-backend/   API 서버 (Pod 2개, 수집·경고 규칙 포함)
+  menu-pick-valkey/    백엔드 Pod들이 함께 쓰는 캐시 (Redis 호환 Valkey)
 ```
 
 ## 전체 흐름
@@ -23,6 +25,20 @@ services/      menu-pick 서비스 매니페스트 (menu-pick-backend, 수집·�
 
 backend push ─▶ CI(테스트·GHCR 이미지) ─▶ 이 저장소의 이미지 태그 커밋 ─▶ Argo CD 배포
 ```
+
+## 캐시 (Valkey)
+
+- 백엔드는 카카오에서 받은 근처 음식점 목록을 좌표 칸(약 100m)별로 10분 동안 Valkey에 저장해, 두 Pod가 함께 쓴다.
+- 캐시 전용이라 디스크에 저장하지 않는다 (`maxmemory 48mb`, `allkeys-lru`). 재시작하면 비지만 다시 채워진다.
+- 비밀번호 대신 NetworkPolicy로 백엔드 Pod만 접속할 수 있다.
+- Valkey가 죽어도 백엔드는 캐시 없이 카카오를 불러 정상 응답한다.
+
+```sh
+# 저장된 키 보기
+kubectl -n menu-pick exec deploy/menu-pick-valkey -- valkey-cli --scan --pattern 'nearby-restaurants*'
+```
+
+## 운영 원칙
 
 - 클러스터에 무엇을 배포할지는 `apps/`에 Application을 추가해서 정한다.
 - 비밀값은 평문으로 커밋하지 않는다. Sealed Secrets로 암호화한 `SealedSecret`만 커밋한다.
