@@ -3,6 +3,9 @@ apiVersion: v1
 kind: Service
 metadata:
   name: menu-pick-valkey
+  labels:
+    # ServiceMonitor가 이 라벨로 수집 대상을 찾는다
+    app: menu-pick-valkey
 spec:
   selector:
     app: menu-pick-valkey
@@ -10,3 +13,7 @@ spec:
     - name: valkey
       port: 6379
       targetPort: valkey
+    # Prometheus만 수집 (redis_exporter)
+    - name: metrics
+      port: 9121
+      targetPort: metrics

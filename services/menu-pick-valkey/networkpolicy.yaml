@@ -15,3 +15,13 @@ spec:
               app: menu-pick-backend
       ports:
         - port: valkey
+    # 지표 포트는 monitoring 네임스페이스의 Prometheus만 수집할 수 있다
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - port: metrics
