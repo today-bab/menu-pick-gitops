@@ -32,9 +32,10 @@ spec:
             - ""
             - --appendonly
             - "no"
-            # 메모리가 차면 가장 오래 안 쓴 키부터 지운다 (limits보다 작게 둔다)
+            # 메모리가 차면 가장 오래 안 쓴 키부터 지운다 (limits보다 작게 둔다).
+            # 칸 하나에 최대 405곳(약 70KB)이라 128MB면 칸 1,500개 이상을 담는다
             - --maxmemory
-            - 48mb
+            - 128mb
             - --maxmemory-policy
             - allkeys-lru
           ports:
@@ -51,9 +52,9 @@ spec:
           resources:
             requests:
               cpu: 10m
-              memory: 64Mi
+              memory: 160Mi
             limits:
-              memory: 96Mi
+              memory: 192Mi
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

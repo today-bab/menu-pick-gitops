@@ -29,7 +29,7 @@ backend push ─▶ CI(테스트·GHCR 이미지) ─▶ 이 저장소의 이미
 ## 캐시 (Valkey)
 
 - 백엔드는 카카오에서 받은 근처 음식점 목록을 좌표 칸(약 100m)별로 10분 동안 Valkey에 저장해, 두 Pod가 함께 쓴다.
-- 캐시 전용이라 디스크에 저장하지 않는다 (`maxmemory 48mb`, `allkeys-lru`). 재시작하면 비지만 다시 채워진다.
+- 캐시 전용이라 디스크에 저장하지 않는다 (`maxmemory 128mb`, `allkeys-lru`). 재시작하면 비지만 다시 채워진다.
 - 비밀번호 대신 NetworkPolicy로 백엔드 Pod만 접속할 수 있다.
 - Valkey가 죽어도 백엔드는 캐시 없이 카카오를 불러 정상 응답한다.
 
