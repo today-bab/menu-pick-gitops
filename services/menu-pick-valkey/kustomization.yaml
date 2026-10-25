@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# 네임스페이스는 services/menu-pick-backend가 만든다
+namespace: menu-pick
+resources:
+  - deployment.yaml
+  - service.yaml
+  - networkpolicy.yaml

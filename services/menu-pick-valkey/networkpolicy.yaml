@@ -1,0 +1,17 @@
+# 비밀번호 없이 쓰는 대신, 백엔드 Pod만 Valkey에 접속할 수 있게 막는다
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: menu-pick-valkey
+spec:
+  podSelector:
+    matchLabels:
+      app: menu-pick-valkey
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: menu-pick-backend
+      ports:
+        - port: valkey

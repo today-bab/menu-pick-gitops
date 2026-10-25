@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: menu-pick-valkey
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/today-bab/menu-pick-gitops.git
+    targetRevision: main
+    path: services/menu-pick-valkey
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: menu-pick
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
