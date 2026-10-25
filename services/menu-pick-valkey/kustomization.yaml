@@ -6,5 +6,6 @@ resources:
   - deployment.yaml
   - service.yaml
   - networkpolicy.yaml
-  # 지표 수집 (platform/monitoring의 Prometheus가 읽음)
+  # 지표 수집과 경고 규칙 (platform/monitoring의 Prometheus가 읽음)
   - servicemonitor.yaml
+  - prometheusrule.yaml

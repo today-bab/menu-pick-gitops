@@ -38,6 +38,16 @@ spec:
             summary: 카카오 로컬 API 호출이 자주 실패함
             description: '최근 10분 카카오 호출 실패율: {{ $value | humanizePercentage }}. 키·쿼터·카카오 장애를 확인하세요.'
 
+        - alert: MenuPickCacheErrors
+          # 캐시 저장소 오류로 캐시 없이 카카오를 부른 횟수. Valkey는 살아 있는데 접속·직렬화가 실패할 때도 잡는다
+          expr: sum(increase(restaurant_cache_errors_total{job="menu-pick-backend"}[5m])) > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: 백엔드가 캐시 없이 카카오를 직접 부르고 있음
+            description: '최근 5분 캐시 오류 {{ $value | humanize }}건. 백엔드 로그의 "캐시 조회 실패"와 Valkey 상태를 확인하세요.'
+
         - alert: MenuPickSlowResponses
           # 평균 응답 시간 (지연 분포 히스토그램은 수집하지 않으므로 평균으로 본다)
           expr: |

@@ -1,0 +1,18 @@
+# Valkey 경고 규칙. Valkey가 죽어도 백엔드는 캐시 없이 동작하므로 서비스 장애(critical)가 아니라 warning으로 알린다.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: menu-pick-valkey
+spec:
+  groups:
+    - name: menu-pick-valkey
+      rules:
+        - alert: MenuPickValkeyDown
+          # exporter가 Valkey에 접속하지 못하거나(redis_up 0) exporter 자체를 수집하지 못할 때(값 없음)
+          expr: absent(redis_up{job="menu-pick-valkey"} == 1)
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: menu-pick 캐시(Valkey)가 응답하지 않음
+            description: 2분 넘게 Valkey에 접속할 수 없습니다. 백엔드는 캐시 없이 카카오를 직접 부르고 있으니 Valkey Pod 상태를 확인하세요.
