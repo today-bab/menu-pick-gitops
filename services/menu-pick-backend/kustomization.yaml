@@ -15,4 +15,4 @@ resources:
 images:
   # 백엔드 CI가 main에 push될 때마다 이 태그를 커밋 SHA로 갱신한다
   - name: ghcr.io/today-bab/menu-pick-backend
-    newTag: 5fa01a5b1aa8b53d1d328770bc51601d7376d20b
+    newTag: c6da257ad572048a63047b00e44c3cd583022e11
