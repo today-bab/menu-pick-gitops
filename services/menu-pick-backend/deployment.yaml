@@ -17,6 +17,8 @@ spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 1001
+      # preStop 대기 10초 + Spring graceful shutdown 최대 30초 + 여유
+      terminationGracePeriodSeconds: 45
       containers:
         - name: menu-pick-backend
           # 태그는 kustomization.yaml의 images에서 정한다 (CI가 갱신)
@@ -59,6 +61,12 @@ spec:
             httpGet:
               path: /actuator/health/readiness
               port: management
+          lifecycle:
+            # 종료 신호를 보내기 전에 기다려, Service 라우팅에서 이 Pod가 빠질 시간을 준다.
+            # 없으면 Spring이 먼저 새 연결을 거부해 그 사이 cloudflared 요청이 502가 된다
+            preStop:
+              sleep:
+                seconds: 10
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
