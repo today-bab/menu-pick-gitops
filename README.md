@@ -26,6 +26,13 @@ services/      menu-pick 서비스 매니페스트
 backend push ─▶ CI(테스트·GHCR 이미지) ─▶ 이 저장소의 이미지 태그 커밋 ─▶ Argo CD 배포
 ```
 
+## 무중단 배포
+
+- 백엔드는 Pod 2개를 하나씩 교체한다 (RollingUpdate).
+- 옛 Pod는 종료 전에 `preStop`에서 10초 기다린다. 그동안 Service 라우팅에서 빠지고, 그 뒤 Spring graceful shutdown으로 처리 중인 요청을 마친다.
+- 이 대기가 없을 때는 배포마다 cloudflared 요청 일부가 종료 중인 Pod로 가서 `connection refused`(502)가 났다.
+  재시작 중 요청 약 800건을 보내 보니 대기 전에는 1건이 실패했고, 대기 후에는 두 번 모두 0건이었다.
+
 ## 캐시 (Valkey)
 
 - 백엔드는 카카오에서 받은 근처 음식점 목록을 좌표 칸(약 100m)별로 10분 동안 Valkey에 저장해, 두 Pod가 함께 쓴다.
