@@ -182,6 +182,19 @@
         }
       ],
       "fieldConfig": { "defaults": { "unit": "reqps" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "캐시 미스 처리 (초당): 락을 잡고 조회 / 기다려서 씀 / 기다리다 포기",
+      "gridPos": { "x": 0, "y": 32, "w": 24, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (outcome) (rate(restaurant_cache_misses_total{application=\"menu-pick-backend\"}[5m]))",
+          "legendFormat": "{{outcome}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" } }
     }
   ]
 }
