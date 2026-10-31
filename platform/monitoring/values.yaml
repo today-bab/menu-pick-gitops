@@ -1,7 +1,8 @@
 # kube-prometheus-stack values (차트 버전은 apps/monitoring.yaml)
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
 
-# kubeadm은 이 구성요소들의 지표를 노드의 127.0.0.1에만 열어 Prometheus가 닿지 못한다.
+# k3s는 scheduler·controller-manager·kube-proxy를 k3s 프로세스 하나에 넣어 지표를 노드의 127.0.0.1에만 열고,
+# 단일 server 구성이라 etcd 대신 내장 SQLite를 쓴다. Prometheus가 닿을 수 없어
 # 켜 두면 수집 실패 경고만 계속 나므로 수집과 관련 규칙을 끈다.
 kubeEtcd:
   enabled: false
