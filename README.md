@@ -47,6 +47,7 @@ kubectl -n menu-pick exec deploy/menu-pick-valkey -- valkey-cli --scan --pattern
 
 ## 운영 원칙
 
+- 이슈·브랜치·커밋·PR·머지 규칙은 [docs/git-conventions.md](docs/git-conventions.md)를 따른다.
 - 클러스터에 무엇을 배포할지는 `apps/`에 Application을 추가해서 정한다.
 - 비밀값은 평문으로 커밋하지 않는다. Sealed Secrets로 암호화한 `SealedSecret`만 커밋한다.
 
