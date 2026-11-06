@@ -1,0 +1,28 @@
+name: 기능
+description: 배포 구성·모니터링 추가·변경, 설정 등 장애가 아닌 작업
+title: '[Feat] '
+labels: [enhancement]
+body:
+  - type: textarea
+    id: background
+    attributes:
+      label: 배경
+      description: 왜 이 작업이 필요한가
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: 할 일
+      description: 커밋 단위로 나눈 작업 목록
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 완료 조건
+      description: 무엇이 되면 이 이슈를 닫을 수 있나 (Argo CD 동기화 상태, 지표·알림 확인 등)
+    validations:
+      required: true

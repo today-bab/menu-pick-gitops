@@ -1,0 +1,41 @@
+name: Conventions
+
+# docs/git-conventions.md의 브랜치 이름·PR 제목·이슈 연결 규칙을 검사한다
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions: {}
+
+jobs:
+  conventions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 규칙 검사
+        # PR 제목과 본문은 사용자가 쓴 값이라 스크립트에 직접 넣지 않고 환경변수로 넘긴다
+        env:
+          BRANCH: ${{ github.head_ref }}
+          TITLE: ${{ github.event.pull_request.title }}
+          BODY: ${{ github.event.pull_request.body }}
+          TYPES: feat|fix|docs|chore|ci
+          # PR 제목에 쓰는 타입 표기. 브랜치 타입과 순서를 맞춘다
+          TITLE_TYPES: Feat|Fix|Docs|Chore|CI
+        run: |
+          failed=0
+
+          if [[ ! "$BRANCH" =~ ^($TYPES)/[0-9]+-[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
+            echo "::error::브랜치 이름이 '<타입>/<이슈번호>-<짧은-설명>' 형식이 아닙니다: $BRANCH"
+            failed=1
+          fi
+
+          if [[ ! "$TITLE" =~ ^\[($TITLE_TYPES)\]\ .+ ]]; then
+            echo "::error::PR 제목이 '[<타입>] <요약>' 형식이 아닙니다 (예: [Feat] Grafana에 캐시 패널 추가): $TITLE"
+            failed=1
+          fi
+
+          if ! grep -qiE '(^|[^[:alnum:]])closes #[0-9]+' <<< "$BODY"; then
+            echo "::error::PR 본문에 'Closes #<이슈번호>'가 없습니다"
+            failed=1
+          fi
+
+          exit $failed
